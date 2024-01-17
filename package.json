@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start":"nodemon src/app.js",
     "dev": "env-cmd -f ./config/dev.env node src/app.js"
   },
   "author": "",

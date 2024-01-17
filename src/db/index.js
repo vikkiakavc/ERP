@@ -24,6 +24,12 @@ db.Sequelize = Sequelize
 
 db.admin = require('../models/admin')(sequelize, DataTypes)
 db.transaction = require('../models/transaction')(sequelize,DataTypes)
+db.department =require('../models/depatment')(sequelize,DataTypes)
+
+//one to many between department and user
+
+
+//one to many between user and department
 
 db.sequelize.sync({ force: false }).then(() => {
     console.log(' yes re-sync')
