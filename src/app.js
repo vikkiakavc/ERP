@@ -4,6 +4,11 @@ const app = express();
 
 const port = process.env.PORT
 
+const adminRouter = require('./routers/adminRouter')
+
+app.use(express.json());
+app.use(adminRouter)
+
 app.get('/', (req, res) => {
     res.send('Welcome to the app')
 })

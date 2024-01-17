@@ -27,3 +27,5 @@ const auth = async (req, res, next) => {
         return res.status(404).send({ error : 'Please authenticate!'})
     }
 }
+
+module.exports =auth
