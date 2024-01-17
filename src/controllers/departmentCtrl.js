@@ -94,7 +94,15 @@ const departmentlist=async(req,res)=>{
         res.status(404).send({error:"Please authenticate as admin first"})
     }
     try{
-        const departments=await Department.findAll();    //filters to be added
+        const name=req.query.name
+        let wherecondition={}
+
+        if (name) {
+            wherecondition.name = name;
+          }
+        const departments=await Department.findAll({
+            where:wherecondition,
+        });    
         res.json(departments);
     }
     catch(e){
