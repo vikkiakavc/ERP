@@ -4,13 +4,9 @@ module.exports = (sequelize, DataTypes) => {
             type : DataTypes.DECIMAL(10,2),
             allownull : false
         },
-        data: {
-            type : DataTypes.DATE,
-            allownull : false
-        },
         type : {
-            type : DataTypes.STRING,
-            allownull : false
+            type: DataTypes.ENUM('Income', 'Expanse'),
+            allowNull: false,
         },
         description : {
             type : DataTypes.TEXT,
