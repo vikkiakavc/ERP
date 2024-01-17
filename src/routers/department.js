@@ -5,8 +5,7 @@ const auth = require('../middleware/auth')
 
 router.post('/departments',auth, departmentCtrl.addDepartment)
 router.patch('/departments/:departmentId',auth, departmentCtrl.updateDepartment)
-router.delete('/departments/:departementId', auth, departmentCtrl.deleteDepartment)
+router.delete('/departments/:departmentId', auth, departmentCtrl.deleteDepartment)
 router.get('/departments', auth, departmentCtrl.departmentlist)
-
 
 module.exports = router

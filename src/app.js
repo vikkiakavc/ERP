@@ -5,9 +5,11 @@ const app = express();
 const port = process.env.PORT
 
 const adminRouter = require('./routers/adminRouter')
+const departmentRouter =require('./routers/department')
 
 app.use(express.json());
 app.use(adminRouter)
+app.use(departmentRouter)
 
 app.get('/', (req, res) => {
     res.send('Welcome to the app')

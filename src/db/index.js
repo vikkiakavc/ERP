@@ -27,9 +27,11 @@ db.transaction = require('../models/transaction')(sequelize,DataTypes)
 db.department =require('../models/depatment')(sequelize,DataTypes)
 
 //one to many between department and user
+// db.department.hasMany(db.user, {foreignKey: 'departmentId'})
+// db.user.belongsTo(db.department, {foreignKey: 'departmentId'})
 
+//one to many between department and project
 
-//one to many between user and department
 
 db.sequelize.sync({ force: false }).then(() => {
     console.log(' yes re-sync')

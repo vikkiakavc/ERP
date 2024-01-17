@@ -1,7 +1,7 @@
 const db = require('../db/index')
 const Department = db.department
-const User=db.user
-const Project=db.project
+// const User=db.user
+// const Project=db.project
 
 const addDepartment=async(req,res)=>{
     if (!req.admin){
@@ -27,7 +27,7 @@ const updateDepartment=async(req,res)=>{
         const{name,description}=req.body;
         departmentId=req.params.departmentId;
 
-        const department=await findByPk(departmentId);
+        const department=await Department.findByPk(departmentId);
 
         if(!department)
         {
@@ -54,7 +54,7 @@ const deleteDepartment = async(req,res)=>{
         return res.status(404).send({error:"please authenticate as admin first"})
     }
     try{
-        departmentId=req.params.departmentId;
+        const departmentId=req.params.departmentId;
 
         const department=await Department.findByPk(departmentId);
 
@@ -62,22 +62,22 @@ const deleteDepartment = async(req,res)=>{
             return res.status(404).json({message:"department not found!"})
         }
     //corresponding users in the department
-    const users=await User.findAll({
-        where:{
-            departmentId
-        }
-    })
-    //corresponding projects in department
-    const projects=await Project.findAll({
-        where:{
-            departmentId
-        }
-    })
+    // const users=await User.findAll({
+    //     where:{
+    //         departmentId
+    //     }
+    // })
+    // //corresponding projects in department
+    // const projects=await Project.findAll({
+    //     where:{
+    //         departmentId
+    //     }
+    // })
 
-    if(users||projects)
-    {
-        return res.send({message:"Remove associated users and projects first!"})
-    }
+    // if(users||projects)
+    // {
+    //     return res.send({message:"Remove associated users and projects first!"})
+    // }
 
     await department.destroy();
     res.status(204).json(department);
