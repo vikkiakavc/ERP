@@ -2,6 +2,8 @@ const { DECIMAL } = require('sequelize');
 const db = require('../db/index')
 const Project = db.project
 const Department = db.department
+const Users = db.users
+const ProjectUserRelation = db.userProject
  
 // Create a new project
 const createProject = async (req, res) => {
@@ -47,6 +49,44 @@ const getAllProjects = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+// Assign Project
+const assignProject = async (req, res) => {
+  try {
+    //const { projectId } = req.params;
+    const { userId, projectId } = req.body;
+
+    // Check if the user exists
+    const user = await Users.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check user's department with project's department
+    const project = await Project.findByPk(projectId);
+    if (!project || project.departmentId !== user.departmentId) {
+      return res.status(400).json({ error: 'Invalid assignment. User and project departments do not match.' });
+    }
+
+    // Check user workload (5 or more projects)
+    const userProjectsCount = await ProjectUserRelation.count({ where: { userId } });
+    if (userProjectsCount >= 5) {
+      return res.status(400).json({ error: 'User workload exceeds the limit. Cannot assign more projects.' });
+    }
+
+    // Create a relation between the project and user
+    const projectUserRelation = await ProjectUserRelation.create({
+      projectId,
+      userId,
+    });
+
+    res.status(201).json({message: "Successfully alloted",projectUserRelation});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' }); 
+  }
+};
+
 
 // Read a specific project by ID
 const getProjectById = async (req, res) => {
@@ -105,5 +145,6 @@ module.exports = {
     getAllProjects,
     getProjectById,
     updateProjectById,
-    deleteProjectById
+    deleteProjectById,
+    assignProject
 }
