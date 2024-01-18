@@ -1,6 +1,7 @@
 const db = require('../db/index')
+const project = require('../models/project')
 const Users = db.users
-
+const Project = db.project
 
 // register a new user
 const addUser = async (req, res) => {
@@ -128,6 +129,26 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const getuserProfile = async(res,req)=>{
+    try {
+        const userId = req.user.id
+        const userWithProjects = await Users.findByPk(userId, {
+            include: [{
+                model: Project,
+                as: 'projects' // Adjust this according to your model associations
+            }]
+        });
+
+        if (userWithProjects) {
+            res.json(userWithProjects.projects);
+        } else {
+            res.status(404).send('User not found');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred');
+    }
+}
 
 module.exports = {
     addUser,
@@ -136,5 +157,6 @@ module.exports = {
     logoutAll,
     getUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getuserProfile
 }
