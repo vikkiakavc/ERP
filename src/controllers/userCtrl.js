@@ -2,6 +2,7 @@ const db = require('../db/index')
 const project = require('../models/project')
 const Users = db.users
 const Project = db.project
+const userProject = db.userProject
 
 // register a new user
 const addUser = async (req, res) => {
@@ -69,27 +70,6 @@ const logoutAll = async (req, res) => {
     }
 }
 
-// get user profile
-const getUser = async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.status(401).send({ error: 'Please authenticate as a user!' })
-        }
-        // const user = await Users.findOne(
-        //     {
-        //         where: { id: req.user.id },
-        //         include: [
-        //             { model: Books, as: 'books' },
-        //         ]
-        //     },
-        // )
-        res.status(200).send({ user : req.user});
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Internal Server Error' });
-    }
-}
-
 // update user
 const updateUser = async (req, res) => {
     try {
@@ -131,19 +111,18 @@ const deleteUser = async (req, res) => {
 
 const getuserProfile = async(res,req)=>{
     try {
-        const userId = req.user.id
-        const userWithProjects = await Users.findByPk(userId, {
-            include: [{
-                model: Project,
-                as: 'projects' // Adjust this according to your model associations
-            }]
-        });
-
-        if (userWithProjects) {
-            res.json(userWithProjects.projects);
-        } else {
-            res.status(404).send('User not found');
+        if (!req.user) {
+            return res.status(401).send({ error: 'Please authenticate as a user!' })
         }
+        const projectsOfTheUser = await Users.findAll({ where : {
+            userId : req.user.id,
+            include : [{
+                model : Project,
+                as : 'projects'
+            }]
+        }})
+
+        res.status(200).send({ user: req.user, projectsOfTheUser : projectsOfTheUser.projects})
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred');
