@@ -131,19 +131,21 @@ const deleteUser = async (req, res) => {
 
 const getuserProfile = async(res,req)=>{
     try {
+        if (!req.user) {
+            return res.status(401).send({ error: 'Please authenticate as a user!' })
+        }
         const userId = req.user.id
         const userWithProjects = await Users.findByPk(userId, {
             include: [{
                 model: Project,
-                as: 'projects' // Adjust this according to your model associations
+                as: 'projects'
             }]
         });
 
-        if (userWithProjects) {
-            res.json(userWithProjects.projects);
-        } else {
+        if (!userWithProjects) {
             res.status(404).send('User not found');
         }
+        res.json(userWithProjects.projects);
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred');

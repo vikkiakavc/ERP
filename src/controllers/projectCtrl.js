@@ -99,15 +99,23 @@ const assignProject = async (req, res) => {
 const getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
-    const project = await Project.findByPk(id);
- 
-    if (project) {
-      res.status(200).json(project);
-    } else {
-      res.status(404).json({ error: 'Project not found' });
+    // const project = await Project.findByPk(id);
+    if (!req.user) {
+      return res.status(401).send({ error: 'Please authenticate as a user!' })
     }
+    const projectWithUsers = await Project.findByPk(id, {
+        include: [{
+            model: Users,
+            as: 'users'
+        }]
+    });
+
+    if (!projectWithUsers) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    res.status(200).json(projectWithUsers.users);
   } catch (error) {
-    console.error('Error reading project:', error);
+    // console.error('Error reading project:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -146,7 +154,23 @@ const deleteProjectById = async (req, res) => {
   }
 };
 const getAllUsers = async (res,req) => {
-  
+  try {
+    const projectId = req.user.projectId;
+    const projectWithUsers = await Project.findByPk(projectId, {
+        include: [{
+            model: Users,
+            as: 'users' // Adjust this according to your model associations
+        }]
+    });
+    if (projectWithUsers) {
+        res.json(projectWithUsers.users);
+    } else {
+        res.status(404).send('Project not found');
+    }
+} catch (error) {
+    console.error(error);
+    res.status(500).send('Internal server error!');
+}
 }
 
 module.exports = {
@@ -155,5 +179,6 @@ module.exports = {
     getProjectById,
     updateProjectById,
     deleteProjectById,
-    assignProject
+    assignProject,
+    getAllUsers
 }
