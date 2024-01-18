@@ -26,14 +26,20 @@ db.admin = require('../models/admin')(sequelize, DataTypes)
 db.transaction = require('../models/transaction')(sequelize,DataTypes)
 db.department =require('../models/depatment')(sequelize,DataTypes)
 db.users = require('../models/users')(sequelize, DataTypes)
-db.project = require('../models/project')
+db.project = require('../models/project')(sequelize, DataTypes)
+db.userProject = require('../models/userProject')(sequelize, DataTypes)
 
 // one to many between users and department 
 db.department.hasMany(db.users, {foreignKey: 'departmentId'})
 db.users.belongsTo(db.department, {foreignKey: 'departmentId'})
 
-//one to many between department and project
+// many to mant between users and project
+db.users.belongsToMany(db.project , { foreignKey: 'userId', through : 'userProjects'})
+db.project.belongsToMany(db.users , { foreignKey: 'projectId', through : 'userProjects'})
 
+//many to many between department and project
+db.department.belongsToMany(db.project , { foreignKey: 'departmentId', through : 'projectDepartments'})
+db.project.belongsToMany(db.department , { foreignKey: 'projectId', through : 'projectDepartments'})
 
 db.sequelize.sync({ force: true }).then(() => {
     console.log(' yes re-sync')
