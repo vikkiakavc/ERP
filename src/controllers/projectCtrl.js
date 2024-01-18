@@ -138,7 +138,9 @@ const deleteProjectById = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
+const getAllUsers = async (res,req) => {
+  
+}
 
 module.exports = {
     createProject,
