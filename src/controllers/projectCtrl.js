@@ -95,6 +95,32 @@ const assignProject = async (req, res) => {
 };
 
 
+
+const unassignProject =async (req, res) => {
+  
+  try {
+    // Find and delete the ProjectUserRelation entry
+    const { userId, projectId } = req.body;
+    const deletedRelation = await ProjectUserRelation.destroy({
+      where: {
+        projectId: projectId,
+        userId: userId,
+      },
+    });
+
+    if (deletedRelation) {
+      res.status(200).json({ message: 'Project assignment deleted successfully.' });
+    } else {
+      res.status(404).json({ message: 'Project assignment not found.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+
 // Read a specific project by ID
 const getProjectById = async (req, res) => {
   try {
@@ -153,5 +179,6 @@ module.exports = {
     getProjectById,
     updateProjectById,
     deleteProjectById,
-    assignProject
+    assignProject,
+    unassignProject
 }

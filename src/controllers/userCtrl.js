@@ -74,14 +74,7 @@ const getUser = async (req, res) => {
         if (!req.user) {
             return res.status(401).send({ error: 'Please authenticate as a user!' })
         }
-        // const user = await Users.findOne(
-        //     {
-        //         where: { id: req.user.id },
-        //         include: [
-        //             { model: Books, as: 'books' },
-        //         ]
-        //     },
-        // )
+
         res.status(200).send({ user : req.user});
     } catch (error) {
         console.error(error);
