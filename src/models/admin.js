@@ -35,6 +35,16 @@ module.exports = (sequelize, DataTypes) => {
             }
 
         },
+        gender: {
+            type: DataTypes.STRING,
+            allownull: false,
+            validate: {
+                isIn: {
+                    args: [['Male', 'Female']],
+                    msg: 'Please select from your gender from Male or Female only'
+                }
+            }
+        },
         role : {
             type : DataTypes.STRING,
             defaultValue : 'ADMIN'

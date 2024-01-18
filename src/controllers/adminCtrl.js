@@ -1,7 +1,5 @@
 const db = require('../db/index')
 const Admin = db.admin
-const Transaction = db.transaction
-const moment = require('moment');
 
 // register admin
 const addAdmin = async (req, res) => {
@@ -210,8 +208,4 @@ module.exports = {
     logoutAllAdmin,
     updateAdmin,
     deleteAdmin,
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    generateReport
 }

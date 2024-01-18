@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const db = require('../db/index')
 const { Op, literal } = require('sequelize');
 const Admin = db.admin
+const Users = db.users
 
 const auth = async (req, res, next) => {
     try{
@@ -20,7 +21,16 @@ const auth = async (req, res, next) => {
             next()
         }
         if (decoded.userType === 'user'){
-
+            const user = await Users.findOne({ where : {
+                id : decoded.id,
+                [Op.and]: literal(`JSON_CONTAINS(tokens, '${JSON.stringify({ token: token })}')`)
+            }})
+            if (!user){
+                throw new Error()
+            }
+            req.user = user
+            req.token = token
+            next()
         }
     }catch(e) {
         console.log(e)

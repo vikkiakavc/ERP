@@ -3,9 +3,17 @@ const Department = db.department
 // const User=db.user
 // const Project=db.project
 
-const addDepartment=async(req,res)=>{
-    if (!req.admin){
-        return res.status(404).send({ error : 'Please authenticate as an admin!'})
+const addDepartment = async (req, res) => {
+    if (!req.admin) {
+        return res.status(404).send({ error: 'Please authenticate as an admin!' })
+    }
+    try {
+        const department = await Department.create(req.body);
+        res.status(201).send({ department });
+    }
+    catch (e) {
+        console.log(e);
+        res.status(500).send({ error: "Error creating Department" })
     }
    try
    { 
@@ -19,94 +27,95 @@ const addDepartment=async(req,res)=>{
 
 }
 
-const updateDepartment=async(req,res)=>{
-    if(!req.admin){
-        return res.status(404).send({error:'Please authenticate as an admin '})
+const updateDepartment = async (req, res) => {
+    if (!req.admin) {
+        return res.status(404).send({ error: 'Please authenticate as an admin ' })
     }
-    try{
-        const{name,description}=req.body;
-        departmentId=req.params.departmentId;
-
-        const department=await Department.findByPk(departmentId);
-
-        if(!department)
-        {
-            return res.status(404).json({message: "department not found!"})
+    try {
+        const updates = Object.keys(req.body);
+        const allowedUpdates = ['name', 'description']
+        const isValidUpdate = updates.every((update) => allowedUpdates.includes(update))
+        if (!isValidUpdate){
+            return res.status(404).json({ message: "invalid update!" })
         }
-        
+
+        const departmentId = req.params.departmentId;
+        const department = await Department.findByPk(departmentId);
+
+        if (!department) {
+            return res.status(404).json({ message: "department not found!" })
+        }
+
         //updating the attributes
-        department.name=name||department.name
-        department.description||department.description
+        updates.forEach((update) => department[update]= req.body[update])
 
         await department.save()
 
         res.json(department)
     }
-    catch(e){
+    catch (e) {
         console.log(e)
-        res.status(500).send({error:"Error updating Department"})
+        res.status(500).send({ error: "Error updating Department" })
     }
 }
 
-const deleteDepartment = async(req,res)=>{
-    if(!req.admin)
-    {
-        return res.status(404).send({error:"please authenticate as admin first"})
+const deleteDepartment = async (req, res) => {
+    if (!req.admin) {
+        return res.status(404).send({ error: "please authenticate as admin first" })
     }
-    try{
-        const departmentId=req.params.departmentId;
+    try {
+        const departmentId = req.params.departmentId;
 
-        const department=await Department.findByPk(departmentId);
+        const department = await Department.findByPk(departmentId);
 
-        if(!department){
-            return res.status(404).json({message:"department not found!"})
+        if (!department) {
+            return res.status(404).json({ message: "department not found!" })
         }
-    //corresponding users in the department
-    // const users=await User.findAll({
-    //     where:{
-    //         departmentId
-    //     }
-    // })
-    // //corresponding projects in department
-    // const projects=await Project.findAll({
-    //     where:{
-    //         departmentId
-    //     }
-    // })
+        // corresponding users in the department
+        const users = await User.findAll({
+            where:{
+                departmentId
+            }
+        })
+        //corresponding projects in department
+        const projects = await Project.findAll({
+            where:{
+                departmentId
+            }
+        })
 
-    // if(users||projects)
-    // {
-    //     return res.send({message:"Remove associated users and projects first!"})
-    // }
+        if(users||projects)
+        {
+            return res.send({message:"Remove associated users and projects first!"})
+        }
 
-    await department.destroy();
-    res.status(204).json(department);
+        await department.destroy();
+        res.status(204).json(department);
 
     }
-    catch(e)
-    {
-        res.status(500).send({error:" Error deleting department"})
+    catch (e) {
+        res.status(500).send({ error: " Error deleting department" })
     }
 }
 
-const departmentlist=async(req,res)=>{
-    if(!req.admin){
-        res.status(404).send({error:"Please authenticate as admin first"})
+const departmentlist = async (req, res) => {
+    if (!req.admin) {
+        res.status(404).send({ error: "Please authenticate as admin first" })
     }
-    try{
-        const name=req.query.name
-        let wherecondition={}
+    try {
+        const name = req.query.name
+        let wherecondition = {}
 
         if (name) {
             wherecondition.name = name;
-          }
-        const departments=await Department.findAll({
-            where:wherecondition,
-        });    
+        }
+        const departments = await Department.findAll({
+            where: wherecondition,
+        });
         res.json(departments);
     }
-    catch(e){
-        res.status(500).send({error:"Error generating list"})
+    catch (e) {
+        res.status(500).send({ error: "Error generating list" })
     }
 }
 
