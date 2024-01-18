@@ -13,7 +13,7 @@ const addDepartment=async(req,res)=>{
       res.status(201).send({department});
    }
    catch(e){
-    console.log(e);
+    //console.log(e);
     res.status(500).send({error:"Error creating Department"})
    }
 
@@ -110,11 +110,23 @@ const departmentlist=async(req,res)=>{
     }
 }
 
+const hello=async(req,res)=>{
+
+    if(req.query.no==='one')
+    res.json({message: "hello function is called"})
+    else 
+    {
+        res.send('error')
+    }
+
+}
+
 module.exports={
     addDepartment,
     updateDepartment,
     deleteDepartment,
     departmentlist,
+    hello,
 }
 
 

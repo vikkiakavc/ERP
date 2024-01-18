@@ -106,7 +106,6 @@ const deleteAdmin = async (req, res) => {
 }
 
 
-
 // crud ops of user
 // register a user
 const addUser = async (req, res) => {
