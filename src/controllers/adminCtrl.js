@@ -2,6 +2,10 @@ const db = require('../db/index')
 const Admin = db.admin
 const Transaction = db.transaction
 const moment = require('moment');
+const { Op } = require('sequelize');
+const convertCurrency = require('../utils/currencyConverter');
+const transaction = require('../models/transaction');
+
 
 // register admin
 const addAdmin = async (req, res) => {
@@ -142,6 +146,7 @@ const updateTransaction = async (req, res) => {
         }
         const transaction = await Transaction.findOne({ where: { id: req.params.id } })
         const createdAt = new Date(transaction.createdAt);
+        // console.log(createdAt)
         const currentDate = new Date();
         const timeDifference = currentDate - createdAt;
         const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
@@ -191,14 +196,41 @@ const generateReport = async (req, res) => {
         if (!req.admin) {
             return res.status(404).send({ error: 'Please authenticate as an admin!' })
         }
-        const { startDate, endDate} = req.query
-        startDate = new Date(startDate)
-        endDate = new Date(endDate)
-        const transaction = await Transaction({ where : {
-            
-        }})
-    }catch(e) {
+        const { startDate, endDate, currency} = req.query
+        const sD = new Date(startDate)
+        const eD = new Date(endDate)
+        const transactions = await Transaction.findAll({
+            where: {
+                createdAt: {
+                    [Op.between]: [sD, eD],
+                },
+            },
+        });
+        const transactionsInClientCurrency = await Promise.all(transactions.map(async (transaction) => {
+            const convertedAmount = await convertCurrency(transaction.amount, transaction.currency, currency.toUpperCase())
+            return { ...transaction.toJSON(), amount: convertedAmount, currency: currency}
+        }))
 
+        const totalIncome = transactionsInClientCurrency
+            .filter(transaction => transaction.type === 'Income')
+            .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+        const totalExpenses = transactionsInClientCurrency
+            .filter(transaction => transaction.type === 'Expanse')
+            .reduce((sum, transaction) => sum + transaction.amount, 0);
+        
+        
+        const netBalance = totalIncome - totalExpenses;
+        res.status(200).send({
+            totalIncome : totalIncome.toFixed(2),
+            totalExpenses: totalExpenses.toFixed(2),
+            netBalance: netBalance.toFixed(2),
+            transactions: transactionsInClientCurrency,
+        });
+        
+    }catch(e) {
+        console.log(e);
+        res.status(500).send({ error: 'Internal server error!' })
     }
 }
 

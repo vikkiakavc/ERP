@@ -25,7 +25,7 @@ db.Sequelize = Sequelize
 db.admin = require('../models/admin')(sequelize, DataTypes)
 db.transaction = require('../models/transaction')(sequelize,DataTypes)
 
-db.sequelize.sync({ force: false }).then(() => {
+db.sequelize.sync({ force: true }).then(() => {
     console.log(' yes re-sync')
 })
 
