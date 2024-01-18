@@ -34,11 +34,18 @@ const createProject = async (req, res) => {
 // Read all projects
 const getAllProjects = async (req, res) => {
   try {
-    const page = req.query.page || 1
-    const pageSize = req.query.pageSize || 10
+    // const page = req.query.page || 1
+    // const pageSize = req.query.pageSize || 10
+
+    const { departmentId, status, deadline, page = 1, pageSize = 10 } = req.query;
+    const filter = {};
+    if (departmentId) filter.departmentId = departmentId;
+    if (status) filter.status = status;
+    if (deadline) filter.deadline = deadline;
+
     const projects = await Project.findAll({
         where : {
-
+filter
         },
         offset : (page-1)*pageSize,
         limit : page
