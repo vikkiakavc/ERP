@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
         projectId : {
             type : DataTypes.INTEGER,
         },
-        departentId : {
+        departmentId : {
             type : DataTypes.INTEGER
         }
     })

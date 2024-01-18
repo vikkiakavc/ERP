@@ -28,6 +28,7 @@ db.department =require('../models/depatment')(sequelize,DataTypes)
 db.users = require('../models/users')(sequelize, DataTypes)
 db.project = require('../models/project')(sequelize, DataTypes)
 db.userProject = require('../models/userProject')(sequelize, DataTypes)
+db.projectDepartment = require('../models/userProject')(sequelize, DataTypes)
 
 // one to many between users and department 
 db.department.hasMany(db.users, {foreignKey: 'departmentId'})
