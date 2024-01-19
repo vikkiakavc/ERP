@@ -15,12 +15,12 @@ const createProject = async (req, res) => {
         const newProject = await Project.create({
             projectName,
             clientName,
-            startDate,
-            dl,
             description,
+            startDate,
+            deadline: dl,
             status
         });
-        const projectDepartmentRelation = await projectDepartmentRelation.create({
+        const projectRelation = await projectDepartmentRelation.create({
             projectId: newProject.id,
             departmentId
         })
@@ -38,14 +38,12 @@ const getAllProjects = async (req, res) => {
             return res.status(404).send({ error: 'Please authenticate as an admin!' })
         }
         const { status, deadline, page = 1, pageSize = 10 } = req.query;
-        const filter = {};
+        let filter = {};
         if (status) filter.status = status;
         if (deadline) filter.deadline = deadline;
 
         const projects = await Project.findAll({
-            where: {
-                filter
-            },
+            where: filter,
             offset: (page - 1) * pageSize,
             limit: page
         });
@@ -71,11 +69,13 @@ const assignProject = async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Check user's department with project's department
-        const project = await Project.findByPk(projectId);
-        if (!project || project.departmentId !== user.departmentId) {
-            return res.status(400).json({ error: 'Invalid assignment. User and project departments do not match.' });
-        }
+        // // Check user's department with project's department
+        // const project = await Project.findByPk(projectId);
+        // console.log(project)
+        // console.log(user.id)
+        // if (!project || project.departmentId !== user.departmentId) {
+        //     return res.status(400).json({ error: 'Invalid assignment. User and project departments do not match.' });
+        // }
 
         // Check user workload (5 or more projects)
         const userProjectsCount = await ProjectUserRelation.count({ where: { userId } });
@@ -133,10 +133,6 @@ const getProjectById = async (req, res) => {
             return res.status(404).send({ error: 'Please authenticate as an admin!' })
         }
         const { id } = req.params;
-        // const project = await Project.findByPk(id);
-        if (!req.user) {
-            return res.status(401).send({ error: 'Please authenticate as a user!' })
-        }
         const projectWithUsers = await Project.findByPk(id, {
             include: [{
                 model: Users,
@@ -147,7 +143,7 @@ const getProjectById = async (req, res) => {
         if (!projectWithUsers) {
             return res.status(404).json({ error: 'Project not found' });
         }
-        res.status(200).json(projectWithUsers.users);
+        res.status(200).json(projectWithUsers);
     } catch (error) {
         // console.error('Error reading project:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -186,11 +182,16 @@ const deleteProjectById = async (req, res) => {
         }
         const { id } = req.params;
         const project = await Project.findByPk(id)
-        const deletedRelation = await ProjectUserRelation.destroy({
+        const deletedRelationwithUsers = await ProjectUserRelation.destroy({
             where: {
                 projectId: id,
             },
         });
+        const deletedRelationwithDep = await projectDepartmentRelation.destroy({
+            where : {
+                projectId: id,
+            }
+        })
         await project.destroy();
         res.status(204).send({ deletedProject: project })
     } catch (error) {
@@ -198,20 +199,20 @@ const deleteProjectById = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-const getAllUsers = async (res, req) => {
+const getAllUsers = async (req, res) => {
     try {
         if (!req.admin) {
             return res.status(404).send({ error: 'Please authenticate as an admin!' })
         }
-        const projectId = req.params.projectId;
-        const projectWithUsers = await Project.findByPk(projectId, {
+        const projectId = req.params.id;
+        const usersWithProject = await Project.findByPk(projectId, {
             include: [{
                 model: Users,
                 as: 'users'
             }]
         });
-        if (projectWithUsers) {
-            res.json(projectWithUsers);
+        if (usersWithProject) {
+            res.json(usersWithProject);
         } else {
             res.status(404).send('Project not found');
         }
