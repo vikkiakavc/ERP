@@ -114,15 +114,18 @@ const getuserProfile = async(res,req)=>{
         if (!req.user) {
             return res.status(401).send({ error: 'Please authenticate as a user!' })
         }
-        const projectsOfTheUser = await Users.findAll({ where : {
-            userId : req.user.id,
-            include : [{
-                model : Project,
-                as : 'projects'
+        const userId = req.user.id
+        const userWithProjects = await Users.findByPk(userId, {
+            include: [{
+                model: Project,
+                as: 'projects'
             }]
-        }})
+        });
 
-        res.status(200).send({ user: req.user, projectsOfTheUser : projectsOfTheUser.projects})
+        if (!userWithProjects) {
+            res.status(404).send('User not found');
+        }
+        res.json(userWithProjects.projects);
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred');
