@@ -208,5 +208,6 @@ module.exports = {
     updateProjectById,
     deleteProjectById,
     assignProject,
-    getAllUsers
+    getAllUsers,
+    unassignProject
 }

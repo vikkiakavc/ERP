@@ -3,6 +3,7 @@ const project = require('../models/project')
 const Users = db.users
 const Project = db.project
 const userProject = db.userProject
+const ProjectUserRelation = db.userProject
 
 // register a new user
 const addUser = async (req, res) => {
@@ -99,6 +100,12 @@ const deleteUser = async (req, res) => {
             return res.status(404).send({ error: 'Please authenticate as an admin!' })
         }
         const user = await Users.findOne({ where: { id: req.params.id } })
+        // deleteing dependencies
+        const deletedRelation = await ProjectUserRelation.destroy({
+            where: {
+              userId: user.id,
+            },
+          });
         // Delete the user
         await user.destroy();
 
