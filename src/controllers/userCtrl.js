@@ -86,7 +86,7 @@ const updateUser = async (req, res) => {
         const user = await Users.findOne({ where: { id: req.params.id } })
         updates.forEach((update) => user[update] = req.body[update])
         await user.save()
-        res.status(200).send({user})
+        res.status(200).send({ user })
     } catch (e) {
         console.log(e)
         res.status(500).send({ error: 'Internal Server Error' });
@@ -103,9 +103,9 @@ const deleteUser = async (req, res) => {
         // deleteing dependencies
         const deletedRelation = await ProjectUserRelation.destroy({
             where: {
-              userId: user.id,
+                userId: user.id,
             },
-          });
+        });
         // Delete the user
         await user.destroy();
 
@@ -116,10 +116,10 @@ const deleteUser = async (req, res) => {
     }
 };
 
-const getuserProfile = async(res,req)=>{
+const getuserProfile = async (req, res) => {
     try {
         if (!req.user) {
-            return res.status(401).send({ error: 'Please authenticate as a user!' })
+            return res.status(404).send({ error: 'Please authenticate as a user!' })
         }
         const userId = req.user.id
         const userWithProjects = await Users.findByPk(userId, {
@@ -132,10 +132,10 @@ const getuserProfile = async(res,req)=>{
         if (!userWithProjects) {
             res.status(404).send('User not found');
         }
-        res.json(userWithProjects.projects);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('An error occurred');
+        res.json(userWithProjects);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 

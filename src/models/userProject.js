@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
             type : DataTypes.INTEGER,
         },
         projectId : {
-            type : DataTypes.INTEGER
+            type : DataTypes.INTEGER,
         }
     })
     return userProjects
