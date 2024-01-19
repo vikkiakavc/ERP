@@ -49,13 +49,13 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: [],
             allownull: false
         },
-        departmentId : {
-            type : DataTypes.INTEGER,
-        },
-        role : {
+        role: {
             type: DataTypes.STRING,
             allownull: false
-        }
+        },
+        departmentId: {
+            type: DataTypes.INTEGER,
+        },
     })
 
     // class methods (preHooks)
@@ -108,7 +108,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     Users.prototype.toJSON = function () {
-        const user = { ...this.get()}
+        const user = { ...this.get() }
 
         delete user.password
         delete user.tokens
