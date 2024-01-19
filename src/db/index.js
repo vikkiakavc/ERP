@@ -34,7 +34,7 @@ db.projectDepartment = require('../models/userProject')(sequelize, DataTypes)
 db.department.hasMany(db.users, {foreignKey: 'departmentId'})
 db.users.belongsTo(db.department, {foreignKey: 'departmentId'})
 
-// many to mant between users and project
+// many to many between users and project
 db.users.belongsToMany(db.project , { foreignKey: 'userId', through : 'userProjects'})
 db.project.belongsToMany(db.users , { foreignKey: 'projectId', through : 'userProjects'})
 

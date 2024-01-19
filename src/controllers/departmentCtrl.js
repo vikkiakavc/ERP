@@ -1,7 +1,7 @@
 const db = require('../db/index')
 const Department = db.department
-// const User=db.user
-// const Project=db.project
+const User=db.users
+const Project=db.project
 
 const addDepartment = async (req, res) => {
     if (!req.admin) {
@@ -98,6 +98,7 @@ const deleteDepartment = async (req, res) => {
     }
 }
 
+//Get all department
 const departmentlist = async (req, res) => {
     if (!req.admin) {
         res.status(404).send({ error: "Please authenticate as admin first" })
@@ -119,23 +120,36 @@ const departmentlist = async (req, res) => {
     }
 }
 
-const hello=async(req,res)=>{
-
-    if(req.query.no==='one')
-    res.json({message: "hello function is called"})
-    else 
-    {
-        res.send('error')
+//Get all projects under department
+const getAllProject = async (res, req) => {
+    try {
+      if (!req.admin) {
+        return res.status(404).send({ error: 'Please authenticate as an admin!' })
+      }
+      const departmentId = req.params.departmentId;
+      const projectWithdepartment = await Project.findByPk(departmentId, {
+        include: [{
+          model: Project,
+          as: 'projects'
+        }]
+      });
+      if (projectWithdepartment) {
+        res.json( projectWithdepartment);
+      } else {
+        res.status(404).send('Projects not found');
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal server error!');
     }
-
-}
+  }
 
 module.exports={
     addDepartment,
     updateDepartment,
     deleteDepartment,
     departmentlist,
-    hello,
+    getAllProject,
 }
 
 
