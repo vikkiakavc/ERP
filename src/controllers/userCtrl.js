@@ -2,6 +2,8 @@ const db = require('../db/index')
 const project = require('../models/project')
 const Users = db.users
 const Project = db.project
+const userProject = db.userProject
+const ProjectUserRelation = db.userProject
 
 // register a new user
 const addUser = async (req, res) => {
@@ -69,27 +71,6 @@ const logoutAll = async (req, res) => {
     }
 }
 
-// get user profile
-const getUser = async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.status(401).send({ error: 'Please authenticate as a user!' })
-        }
-        // const user = await Users.findOne(
-        //     {
-        //         where: { id: req.user.id },
-        //         include: [
-        //             { model: Books, as: 'books' },
-        //         ]
-        //     },
-        // )
-        res.status(200).send({ user : req.user});
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Internal Server Error' });
-    }
-}
-
 // update user
 const updateUser = async (req, res) => {
     try {
@@ -119,6 +100,12 @@ const deleteUser = async (req, res) => {
             return res.status(404).send({ error: 'Please authenticate as an admin!' })
         }
         const user = await Users.findOne({ where: { id: req.params.id } })
+        // deleteing dependencies
+        const deletedRelation = await ProjectUserRelation.destroy({
+            where: {
+              userId: user.id,
+            },
+          });
         // Delete the user
         await user.destroy();
 
@@ -131,19 +118,21 @@ const deleteUser = async (req, res) => {
 
 const getuserProfile = async(res,req)=>{
     try {
+        if (!req.user) {
+            return res.status(401).send({ error: 'Please authenticate as a user!' })
+        }
         const userId = req.user.id
         const userWithProjects = await Users.findByPk(userId, {
             include: [{
                 model: Project,
-                as: 'projects' // Adjust this according to your model associations
+                as: 'projects'
             }]
         });
 
-        if (userWithProjects) {
-            res.json(userWithProjects.projects);
-        } else {
+        if (!userWithProjects) {
             res.status(404).send('User not found');
         }
+        res.json(userWithProjects.projects);
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred');
@@ -155,7 +144,6 @@ module.exports = {
     loginUser,
     logoutUser,
     logoutAll,
-    getUser,
     updateUser,
     deleteUser,
     getuserProfile
