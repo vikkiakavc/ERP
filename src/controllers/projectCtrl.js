@@ -4,6 +4,7 @@ const Project = db.project
 const Department = db.department
 const Users = db.users
 const ProjectUserRelation = db.userProject
+const projectDepartmentRelation = db.projectDepartment
 
 // Create a new project
 const createProject = async (req, res) => {
@@ -13,13 +14,15 @@ const createProject = async (req, res) => {
         const newProject = await Project.create({
             projectName,
             clientName,
-            departmentId,
             startDate,
             dl,
             description,
             status
         });
-
+        const projectDepartmentRelation = await projectDepartmentRelation.create({
+            projectId : newProject.id,
+            departmentId
+        })
         res.status(201).json(newProject);
     } catch (error) {
         console.error('Error creating project:', error);
@@ -30,12 +33,8 @@ const createProject = async (req, res) => {
 // Read all projects
 const getAllProjects = async (req, res) => {
     try {
-        // const page = req.query.page || 1
-        // const pageSize = req.query.pageSize || 10
-
-        const { departmentId, status, deadline, page = 1, pageSize = 10 } = req.query;
+        const { status, deadline, page = 1, pageSize = 10 } = req.query;
         const filter = {};
-        if (departmentId) filter.departmentId = departmentId;
         if (status) filter.status = status;
         if (deadline) filter.deadline = deadline;
 

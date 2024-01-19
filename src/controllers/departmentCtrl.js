@@ -1,7 +1,7 @@
 const db = require('../db/index')
 const Department = db.department
-// const User=db.user
-// const Project=db.project
+const User=db.users
+const Project=db.project
 
 const addDepartment = async (req, res) => {
     if (!req.admin) {
