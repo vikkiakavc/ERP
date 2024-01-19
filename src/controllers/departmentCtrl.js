@@ -15,6 +15,15 @@ const addDepartment = async (req, res) => {
         console.log(e);
         res.status(500).send({ error: "Error creating Department" })
     }
+   try
+   { 
+      const department=await Department.create(req.body);
+      res.status(201).send({department});
+   }
+   catch(e){
+    //console.log(e);
+    res.status(500).send({error:"Error creating Department"})
+   }
 
 }
 
@@ -89,6 +98,7 @@ const deleteDepartment = async (req, res) => {
     }
 }
 
+//Get all department
 const departmentlist = async (req, res) => {
     if (!req.admin) {
         res.status(404).send({ error: "Please authenticate as admin first" })
@@ -110,11 +120,36 @@ const departmentlist = async (req, res) => {
     }
 }
 
-module.exports = {
+//Get all projects under department
+const getAllProject = async (res, req) => {
+    try {
+      if (!req.admin) {
+        return res.status(404).send({ error: 'Please authenticate as an admin!' })
+      }
+      const departmentId = req.params.departmentId;
+      const projectWithdepartment = await Project.findByPk(departmentId, {
+        include: [{
+          model: Project,
+          as: 'projects'
+        }]
+      });
+      if (projectWithdepartment) {
+        res.json( projectWithdepartment);
+      } else {
+        res.status(404).send('Projects not found');
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal server error!');
+    }
+  }
+
+module.exports={
     addDepartment,
     updateDepartment,
     deleteDepartment,
     departmentlist,
+    getAllProject,
 }
 
 
