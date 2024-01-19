@@ -22,11 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         status: {
             type: DataTypes.ENUM('in progress', 'completed', 'on hold'),
             allowNull: false,
-        },
-        departmentId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
+        }
     })
     return Project
 }

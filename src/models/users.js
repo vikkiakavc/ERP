@@ -51,15 +51,10 @@ module.exports = (sequelize, DataTypes) => {
         },
         departmentId : {
             type : DataTypes.INTEGER,
-            allownull : false
         },
         role : {
             type: DataTypes.STRING,
             allownull: false
-        },
-        projectId : {
-            type : DataTypes.INTEGER,
-            allownull : false
         }
     })
 
