@@ -10,7 +10,7 @@ router.post('/departments',auth, departmentCtrl.addDepartment)
 router.patch('/departments/:departmentId',auth, departmentCtrl.updateDepartment)
 router.delete('/departments/:departmentId', auth, departmentCtrl.deleteDepartment)
 router.get('/departments', auth, departmentCtrl.departmentlist)
-router.get('projects/:departmentId',auth,departmentCtrl.getAllProject)
+router.get('/projectsOfDep/:departmentId',auth,departmentCtrl.getAllProject)
 
 //router.use(errorHandler);
 
