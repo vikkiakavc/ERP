@@ -1,6 +1,8 @@
 const db = require('../db/index')
+const project = require('../models/project')
 const Users = db.users
-
+const Project = db.project
+const userProject = db.userProject
 
 // register a new user
 const addUser = async (req, res) => {
@@ -68,20 +70,6 @@ const logoutAll = async (req, res) => {
     }
 }
 
-// get user profile
-const getUser = async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.status(401).send({ error: 'Please authenticate as a user!' })
-        }
-
-        res.status(200).send({ user : req.user});
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Internal Server Error' });
-    }
-}
-
 // update user
 const updateUser = async (req, res) => {
     try {
@@ -121,13 +109,35 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const getuserProfile = async(res,req)=>{
+    try {
+        if (!req.user) {
+            return res.status(401).send({ error: 'Please authenticate as a user!' })
+        }
+        const userId = req.user.id
+        const userWithProjects = await Users.findByPk(userId, {
+            include: [{
+                model: Project,
+                as: 'projects'
+            }]
+        });
+
+        if (!userWithProjects) {
+            res.status(404).send('User not found');
+        }
+        res.json(userWithProjects.projects);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred');
+    }
+}
 
 module.exports = {
     addUser,
     loginUser,
     logoutUser,
     logoutAll,
-    getUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getuserProfile
 }

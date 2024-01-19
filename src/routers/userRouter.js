@@ -10,6 +10,7 @@ router.post('/users/logoutAll', auth, userCtrl.logoutAll)
 router.get('/users', auth, userCtrl.getUser)
 router.patch('/users' , auth, userCtrl.updateUser)
 router.delete('/users', auth, userCtrl.deleteUser)
+router.get('/users',auth,userCtrl.getuserProfile)
 
 
 module.exports = router
